@@ -6,8 +6,13 @@ fn main() {
     // Load the graph from the dataset file
     let graph = graph::Graph::from_file("data/com-youtube.ungraph.txt");
 
-    // Display the adjacency list
+    // Display the adjacency list (previous feature)
+    println!("Adjacency List:");
     graph.display();
 
-    println!("Graph built successfully!");
+    // Analyze the graph (new feature)
+    println!("\nGraph Analysis:");
+    graph.analyze();
+
+    println!("Graph analysis complete!");
 }

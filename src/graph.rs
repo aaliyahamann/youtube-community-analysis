@@ -49,11 +49,28 @@ impl Graph {
         graph
     }
 
-    // Display the adjacency list (for debugging or analysis)
+    // Display the adjacency list (previously implemented feature)
     pub fn display(&self) {
         for (node, edges) in &self.adjacency_list {
             println!("Node {}: {:?}", node, edges);
         }
+    }
+
+    // New: Analyze the graph and compute its properties
+    pub fn analyze(&self) {
+        let total_nodes = self.adjacency_list.len();
+        let total_edges: usize = self.adjacency_list.values().map(|edges| edges.len()).sum::<usize>() / 2;
+
+        // Compute degrees
+        let degrees: Vec<usize> = self.adjacency_list.values().map(|edges| edges.len()).collect();
+        let max_degree = degrees.iter().max().unwrap_or(&0);
+        let min_degree = degrees.iter().min().unwrap_or(&0);
+
+        // Display results
+        println!("Total Nodes: {}", total_nodes);
+        println!("Total Edges: {}", total_edges);
+        println!("Maximum Degree: {}", max_degree);
+        println!("Minimum Degree: {}", min_degree);
     }
 }
 
