@@ -1,5 +1,5 @@
-use std::collections::{HashMap, HashSet};
-use std::fs::{File, OpenOptions}; 
+use std::collections::{HashMap, HashSet, VecDeque};
+use std::fs::{File, OpenOptions};
 use std::io::{self, BufRead, Write};
 use std::path::Path;
 
@@ -67,7 +67,47 @@ impl Graph {
         println!("Average Degree: {:.2}", avg_degree);
     }
 
-    // Compute the number of neighbors at distance 2 for each node
+    // Community Detection
+    pub fn detect_communities(&self) -> Vec<HashSet<i32>> {
+        let mut visited = HashSet::new();
+        let mut communities = Vec::new();
+
+        for &node in self.adjacency_list.keys() {
+            if !visited.contains(&node) {
+                let mut community = HashSet::new();
+                let mut queue = VecDeque::new();
+                queue.push_back(node);
+
+                while let Some(current) = queue.pop_front() {
+                    if !visited.insert(current) {
+                        continue;
+                    }
+                    community.insert(current);
+                    if let Some(neighbors) = self.adjacency_list.get(&current) {
+                        for &neighbor in neighbors {
+                            if !visited.contains(&neighbor) {
+                                queue.push_back(neighbor);
+                            }
+                        }
+                    }
+                }
+
+                communities.push(community);
+            }
+        }
+
+        communities
+    }
+
+    // Compute Degree Centrality
+    pub fn degree_centrality(&self) -> HashMap<i32, usize> {
+        self.adjacency_list
+            .iter()
+            .map(|(node, neighbors)| (*node, neighbors.len()))
+            .collect()
+    }
+
+    // Compute the number of neighbors at distance 2
     pub fn neighbors_at_distance_2(&self) -> HashMap<i32, usize> {
         let mut result = HashMap::new();
         let mut counter = 0;
@@ -135,7 +175,7 @@ impl Graph {
     }
 }
 
-// Helper function to read lines from a file
+// Helper function to read lines from a file (moved directly into `graph.rs`)
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
 where
     P: AsRef<Path>,
