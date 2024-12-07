@@ -6,13 +6,17 @@ fn main() {
     // Load the graph from the dataset file
     let graph = graph::Graph::from_file("data/com-youtube.ungraph.txt");
 
-    // Display the adjacency list (previous feature)
-    println!("Adjacency List:");
-    graph.display();
+    // Compute neighbors at distance 2
+    println!("\nComputing Neighbors at Distance 2...");
+    let neighbors_2 = graph.neighbors_at_distance_2();
 
-    // Analyze the graph (new feature)
-    println!("\nGraph Analysis:");
-    graph.analyze();
+    // Save results to CSV
+    println!("\nSaving results to file...");
+    graph.save_neighbors_at_distance_2(&neighbors_2, "neighbors_at_distance_2.csv");
+
+    // Display top N nodes
+    println!("\nDisplaying top nodes by neighbors at distance 2:");
+    graph.display_top_neighbors_at_distance_2(&neighbors_2, 10);
 
     println!("Graph analysis complete!");
 }
