@@ -6,6 +6,9 @@ DS 210 Final Project: Analyzing community structures within the YouTube social n
 ## Project Overview
 This project analyzes the **YouTube social network** using graph algorithms to detect **community structures** and identify **influential nodes**. The analysis is based on the **SNAP YouTube dataset**, which contains user connections and predefined communities.
 
+## Full Project Write-Up
+You can find the full project write-up [here](https://github.com/aaliyahamann/youtube-community-analysis/blob/9d3cc8a337c40630f967c1c62cbec3882f908c5c/youtube-community-analysis%20writeup.pdf).
+
 ## Dataset
 - **Source**: [SNAP YouTube Social Network Dataset](https://snap.stanford.edu/data/com-Youtube.html)
 - **Files Used**:
