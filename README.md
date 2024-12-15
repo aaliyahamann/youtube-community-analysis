@@ -28,7 +28,7 @@ This project analyzes the **YouTube social network** using graph algorithms to d
 ### Steps
 1. **Clone the Repository**:
    ```bash
-   git clone <your-repository-link>
+   git clone nano https://github.com/aaliyahamann/youtube-community-analysis.git
    cd youtube-community-analysis
 2. **Prepare the Dataset**:
 - Place `com-youtube.ungraph.txt` and `com-youtube.all.cmty.txt` in a `data/` folder in the project root.
