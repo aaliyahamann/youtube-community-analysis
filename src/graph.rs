@@ -95,7 +95,11 @@ pub fn degree_distance_2(graph: &AdjacencyList, node: u32) -> usize {
     if let Some(neighbors) = graph.get(&node) {
         for &neighbor in neighbors {
             if let Some(second_neighbors) = graph.get(&neighbor) {
-                distance_2_neighbors.extend(second_neighbors);
+                for &second_neighbor in second_neighbors {
+                    if second_neighbor != node && !neighbors.contains(&second_neighbor) {
+                        distance_2_neighbors.insert(second_neighbor);
+                    }
+                }
             }
         }
     }
@@ -105,16 +109,17 @@ pub fn degree_distance_2(graph: &AdjacencyList, node: u32) -> usize {
 //Jaccard similarity
 pub fn jaccard_similarity(graph: &AdjacencyList, node1: u32, node2: u32) -> f64 {
     let empty_vec = Vec::new();
-    let neighbors1 = graph.get(&node1).unwrap_or(&empty_vec);
-    let neighbors2 = graph.get(&node2).unwrap_or(&empty_vec);
+    let neighbors1: HashSet<_> = graph.get(&node1).unwrap_or(&empty_vec).iter().cloned().collect();
+    let neighbors2: HashSet<_> = graph.get(&node2).unwrap_or(&empty_vec).iter().cloned().collect();
 
-    let set1: HashSet<_> = neighbors1.iter().cloned().collect();
-    let set2: HashSet<_> = neighbors2.iter().cloned().collect();
+    let intersection = neighbors1.intersection(&neighbors2).count();
+    let union = neighbors1.union(&neighbors2).count();
 
-    let intersection = set1.intersection(&set2).count();
-    let union = set1.union(&set2).count();
-
-    if union == 0 { 0.0 } else { intersection as f64 / union as f64 }
+    if union == 0 {
+        0.0
+    } else {
+        intersection as f64 / union as f64
+    }
 }
 
 #[derive(Debug)]
@@ -197,4 +202,118 @@ pub fn betweenness_centrality_top_nodes(graph: &AdjacencyList, top_n: usize) -> 
 
     progress_bar.finish_with_message("Betweenness centrality calculation completed!");
     centrality
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_load_graph() {
+        // Test graph loaded from a file
+        let graph = load_graph("data/test-graph.txt").unwrap();
+        assert_eq!(graph.len(), 4);
+        assert_eq!(graph[&1], vec![2, 3]);
+        assert_eq!(graph[&2], vec![1, 4]);
+    }
+
+    #[test]
+    fn test_load_communities() {
+        // Test community data loaded from a file
+        let communities = load_communities("data/test-communities.txt").unwrap();
+        assert_eq!(communities.len(), 4);
+        assert_eq!(communities[&1], 0);
+        assert_eq!(communities[&2], 0);
+        assert_eq!(communities[&3], 1);
+        assert_eq!(communities[&4], 1);
+    }
+
+    #[test]
+    fn test_count_edges() {
+        let mut graph = AdjacencyList::new();
+        graph.insert(1, vec![2, 3]);
+        graph.insert(2, vec![1]);
+        graph.insert(3, vec![1]);
+        assert_eq!(count_edges(&graph), 2);
+    }
+
+    #[test]
+    fn test_calculate_degrees() {
+        let mut graph = AdjacencyList::new();
+        graph.insert(1, vec![2, 3]);
+        graph.insert(2, vec![1]);
+        graph.insert(3, vec![1]);
+
+        let degrees = calculate_degrees(&graph);
+        assert_eq!(degrees[&1], 2);
+        assert_eq!(degrees[&2], 1);
+        assert_eq!(degrees[&3], 1);
+    }
+
+    #[test]
+    fn test_find_highest_degree_node() {
+        let mut graph = AdjacencyList::new();
+        graph.insert(1, vec![2, 3]);
+        graph.insert(2, vec![1]);
+        graph.insert(3, vec![1]);
+
+        let highest = find_highest_degree_node(&graph).unwrap();
+        assert_eq!(highest, (1, 2));
+    }
+
+    #[test]
+    fn test_bfs_shortest_path() {
+        let mut graph = AdjacencyList::new();
+        graph.insert(1, vec![2, 3]);
+        graph.insert(2, vec![1, 4]);
+        graph.insert(3, vec![1]);
+        graph.insert(4, vec![2]);
+
+        let distances = bfs_shortest_path(&graph, 1);
+        assert_eq!(distances[&1], 0);
+        assert_eq!(distances[&2], 1);
+        assert_eq!(distances[&3], 1);
+        assert_eq!(distances[&4], 2);
+    }
+
+    #[test]
+    fn test_degree_distance_2() {
+        let mut graph = AdjacencyList::new();
+        graph.insert(1, vec![2, 4]);
+        graph.insert(2, vec![1, 3]);
+        graph.insert(3, vec![2, 4]);
+        graph.insert(4, vec![1, 3]);
+
+        assert_eq!(degree_distance_2(&graph, 1), 1);
+        assert_eq!(degree_distance_2(&graph, 2), 1);
+    }
+
+    #[test]
+    fn test_jaccard_similarity() {
+        let mut graph = AdjacencyList::new();
+        graph.insert(1, vec![3, 4]);
+        graph.insert(2, vec![3, 4]);
+        graph.insert(3, vec![1, 2]);
+        graph.insert(4, vec![1, 2]);
+
+        let similarity = jaccard_similarity(&graph, 1, 2);
+        assert!((similarity - 1.0).abs() < 1e-5); 
+    }
+
+    #[test]
+    fn test_betweenness_centrality_top_nodes() {
+        let mut graph = AdjacencyList::new();
+        graph.insert(1, vec![2, 4]);
+        graph.insert(2, vec![1, 3, 4, 5]);
+        graph.insert(3, vec![2, 5]);
+        graph.insert(4, vec![1, 2]);
+        graph.insert(5, vec![2, 3]);
+
+        let centrality = betweenness_centrality_top_nodes(&graph, 3);
+
+        assert!(centrality[&2] > 0.0);
+        assert!(centrality[&2] > centrality[&1]);
+        assert!(centrality[&2] > centrality[&3]);
+    }
 }

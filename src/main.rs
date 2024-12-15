@@ -109,7 +109,6 @@ fn main() {
             for (node, centrality) in sorted_betweenness.iter().take(5) {
                 println!("Node {}: Betweenness Centrality = {:.4}", node, centrality);
             }
-            
         }
         Err(e) => {
             eprintln!("Error loading graph: {}", e);
