@@ -40,7 +40,7 @@ This project analyzes the **YouTube social network** using graph algorithms to d
 - Ensure that all functions work as intended
 - cargo test
 
-##Example Output
+## Example Output
 Graph loaded successfully with 1134890 nodes.
 The graph has 2987624 edges.
 
