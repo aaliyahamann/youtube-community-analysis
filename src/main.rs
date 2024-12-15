@@ -69,6 +69,47 @@ fn main() {
                 }
                 Err(e) => eprintln!("Error loading communities: {}", e),
             }
+
+            //Run BFS for Six Degrees of Separation
+            let sample_node = 1;
+            println!("\nRunning BFS from node {} to calculate shortest paths:", sample_node);
+            let distances = graph::bfs_shortest_path(&graph, sample_node);
+            println!("Node {} can reach {} nodes.", sample_node, distances.len());
+            println!(
+                "Average shortest path length: {:.2}",
+                distances.values().sum::<usize>() as f64 / distances.len() as f64
+            );
+
+            //Degree distribution at distance 2
+            let degree_2 = graph::degree_distance_2(&graph, sample_node);
+            println!(
+                "\nNode {} has {} neighbors at distance 2.",
+                sample_node, degree_2
+            );
+
+            //Jaccard similarity between two nodes
+            let node_a = 1;
+            let node_b = 2;
+            let similarity = graph::jaccard_similarity(&graph, node_a, node_b);
+            let similarity_category = graph::categorize_similarity(similarity);
+            println!(
+                "\nJaccard similarity between nodes {} and {}: {:.3} ({:?})",
+                node_a, node_b, similarity, similarity_category
+            );
+
+            //Calculate betweenness centrality for nodes with highest degree
+            println!("\nCalculating Betweenness Centrality for top 50 highest degree nodes...");
+            let betweenness = graph::betweenness_centrality_top_nodes(&graph, 50);
+            
+            //Print the top 5 nodes by betweenness centrality
+            let mut sorted_betweenness: Vec<_> = betweenness.iter().collect();
+            sorted_betweenness.sort_by(|a, b| b.1.partial_cmp(a.1).unwrap());
+            
+            println!("\nTop 5 Nodes by Betweenness Centrality:");
+            for (node, centrality) in sorted_betweenness.iter().take(5) {
+                println!("Node {}: Betweenness Centrality = {:.4}", node, centrality);
+            }
+            
         }
         Err(e) => {
             eprintln!("Error loading graph: {}", e);
